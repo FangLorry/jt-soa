@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangjt.common.mapper.UserMapper">
+<resultMap id="result" type="java.util.HashMap">
+  </resultMap> 
+  <resultMap id="baseResultMap" type="com.fangjt.common.entity.User">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="real_name" jdbcType="VARCHAR" property="realName" />
+    <result column="head_url" jdbcType="VARCHAR" property="headUrl" />
+    <result column="lock" jdbcType="INTEGER" property="lock" />
+  </resultMap>
+  <select id="findUserByUsername" resultMap="baseResultMap" >
+  	select * from ss_user where user_name=#{userName}
+  </select>
+</mapper>

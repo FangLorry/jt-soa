@@ -1,0 +1,39 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:rabbit="http://www.springframework.org/schema/rabbit" 
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+    http://www.springframework.org/schema/rabbit
+    http://www.springframework.org/schema/rabbit/spring-rabbit-1.0.xsd" >
+
+    <description>rabbitmq 连接服务配置</description>
+    <!-- 连接配置 -->
+    <rabbit:connection-factory id="connectionFactory" host="127.0.0.1" username="admin" password="123456" port="5672"  />
+    <rabbit:admin connection-factory="connectionFactory"/>
+
+    <!-- spring template声明-->
+     <rabbit:template  exchange="jt-framework-mq"  id="amqpTemplate"  connection-factory="connectionFactory"  message-converter="jsonMessageConverter" />
+
+    <!-- 消息对象json转换类 -->
+    <bean id="jsonMessageConverter" class="org.springframework.amqp.support.converter.Jackson2JsonMessageConverter" />  
+    
+    <!-- 定义一个队列 -->
+    <rabbit:queue id="test_queue_key" name="test_queue_key" durable="true" auto-delete="false" exclusive="false" />
+
+	<!-- 定一个交换机 --> 
+	<rabbit:direct-exchange name="jt-framework-mq"
+		durable="true" auto-delete="false" id="jt-framework-mq">
+
+		<rabbit:bindings>
+			<rabbit:binding queue="test_queue_key" key="test_queue_key" />
+		</rabbit:bindings>
+	</rabbit:direct-exchange>
+
+	<!-- 监听配置 -->
+<!-- 	<rabbit:listener-container -->
+<!-- 		connection-factory="connectionFactory" acknowledge="manual"> -->
+<!-- 		<rabbit:listener queues="test_queue_key" ref="queueListenter" /> -->
+<!-- 	</rabbit:listener-container> -->
+	
+<!-- 	<bean id="queueListenter" class="com.fangjt.mq.service.listener.QueueListenter"></bean> -->
+</beans>

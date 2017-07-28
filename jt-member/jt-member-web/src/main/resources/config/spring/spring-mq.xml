@@ -1,0 +1,21 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:rabbit="http://www.springframework.org/schema/rabbit" 
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+    http://www.springframework.org/schema/rabbit
+    http://www.springframework.org/schema/rabbit/spring-rabbit-1.0.xsd" >
+
+    <description>rabbitmq 消費者配置</description>
+    
+    <!-- 定义一个队列 -->
+    <rabbit:queue id="member_query" name="member_query" durable="true" auto-delete="false" exclusive="false" />
+    
+	<!-- 监听配置 -->
+	<rabbit:listener-container
+		connection-factory="connectionFactory" acknowledge="manual">
+		<rabbit:listener queues="member_query" ref="messageComsumer" />
+	</rabbit:listener-container>
+	
+	<bean id="messageComsumer" class="com.fangjt.member.mqConsumer.MemberMsgComsumer"></bean>
+</beans>

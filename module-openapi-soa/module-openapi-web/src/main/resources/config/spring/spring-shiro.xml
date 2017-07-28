@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+					http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+					http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-2.5.xsd
+					http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+					http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+					http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd" default-lazy-init="true">
+	<description>Shiro安全配置</description>
+	<!-- 继承AuthorizingRealm的自定义Realm -->
+	<bean id="autoRealm" class="com.fangjt.common.shiro.realm.AutoShiroRealm" >
+		<property name="credentialsMatcher">
+			<bean class="com.fangjt.common.shiro.matcher.CustomCredentialsMatcher">
+				<property name = "hashAlgorithmName" value="MD5" />
+             </bean>
+		 </property>
+	</bean>
+	
+	<!-- 会话管理 -->
+	<bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+		<property name="sessionDAO" ref="sessionDAO" />
+	</bean>
+	
+	<bean id="sessionDAO" class="org.apache.shiro.session.mgt.eis.MemorySessionDAO"></bean>
+	
+	<!-- Shiro默认会使用Servlet容器的Session,可通过sessionMode属性来指定使用Shiro原生Session -->  
+	<!-- 即<property name="sessionMode" value="native"/>,详细说明见官方文档 -->  
+	<!-- 这里主要是设置自定义的单Realm应用,若有多个Realm,可使用'realms'属性代替 -->  
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="realm" ref="autoRealm" />
+		<property name="sessionManager" ref="sessionManager" />  
+	</bean>
+	
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<property name="securityManager" ref="securityManager" />
+		<property name="loginUrl" value="/login.jhtml" />
+		<property name="unauthorizedUrl" value="/unanthorized.jhtml" />
+		<property name="successUrl" value="/index.jhtml" />
+		<property name="filterChainDefinitions">
+			<value>
+				/login*=anon
+				/test* = anon
+				/admin/** = authc
+			</value>
+		</property>
+	</bean>
+	<!-- 保证实现了Shiro内部lifecycle函数的bean执行 -->  
+	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+	<!-- 开启Shiro的注解(如@RequiresRoles,@RequiresPermissions),需借助SpringAOP扫描使用Shiro注解的类,并在必要时进行安全逻辑验证 -->  
+	<!-- 配置以下两个bean即可实现此功能 -->  
+	<!-- Enable Shiro Annotations for Spring-configured beans. Only run after the lifecycleBeanProcessor has run -->  
+	<!-- 由于本例中并未使用Shiro注解,故注释掉这两个bean(个人觉得将权限通过注解的方式硬编码在程序中,查看起来不是很方便,没必要使用) -->  
+	<!--   
+	<bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor"/>  
+	  <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">  
+	    <property name="securityManager" ref="securityManager"/>  
+	  </bean>  
+	-->  
+</beans>
