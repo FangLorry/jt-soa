@@ -1,49 +1,45 @@
 package com.fangjt.common.vo;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * 使用ThreadLocal防止多线程问题 edit by fang 160722
  */
 public class Message {
-	private static ThreadLocal<Map<String, Object>> mapThreadLocal = new ThreadLocal<Map<String, Object>>();
-	private static Map<String, Object> map;
-
+	private static ThreadLocal<MessageData> mapThreadLocal = new ThreadLocal<MessageData>();
+	private static MessageData map;
 	static {
 		initMessage();
 	}
 
-	public static Map<String, Object> initMessage() {
+	public static MessageData initMessage() {
 		map = mapThreadLocal.get();
 		if (map == null) {
-			map = new HashMap<String, Object>();
+			map = new MessageData();
 			mapThreadLocal.set(map);
 		}
 		return map;
 	}
 
-	public static Map<String, Object> success(String cont) {
-		map.put("msg", cont);
-		map.put("result_code", 0);
-		if(map.containsKey("data")){
-			map.remove("data");
+	public static MessageData success(String cont) {
+		map.setMsg(cont); 
+		map.setResult_code(0);
+		if(map.getObj() != null){
+			map.setObj(null);
 		}
 		return map;
 	}
 	
-	public static Map<String, Object> success(String cont,Object obj) {
-		map.put("msg", cont);
-		map.put("result_code", 0);
-		map.put("data", obj);
+	public static MessageData success(String cont,Object obj) {
+		map.setMsg(cont); 
+		map.setResult_code(0);
+		map.setObj(obj); 
 		return map;
 	}
 
-	public static Map<String, Object> error(String cont) {
-		map.put("msg", cont);
-		map.put("result_code", 1);
-		if(map.containsKey("data")){
-			map.remove("data");
+	public static MessageData error(String cont) {
+		map.setMsg(cont); 
+		map.setResult_code(1);
+		if(map.getObj() != null){
+			map.setObj(null);
 		}
 		return map;
 	}

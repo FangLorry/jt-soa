@@ -14,13 +14,18 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.fangjt.common.entity.BaseEntity;
+import com.fangjt.common.exception.ValitationException;
 import com.fangjt.common.orm.Filter;
 import com.fangjt.common.orm.Filter.OperateEnum;
 import com.fangjt.common.orm.SelectOption;
 import com.fangjt.common.orm.SelectOptionBuilder;
 import com.fangjt.common.orm.SelectPageOption;
 import com.fangjt.common.orm.Sequencer;
+import com.fangjt.common.vo.Message;
+import com.fangjt.common.vo.MessageData;
 
 
 //动态生成sql语句工具类
@@ -126,17 +131,27 @@ public class CUDTemplate<T extends BaseEntity, ID extends Serializable> {
 	public String findOne(T obj) {
 		return "select * from "+obj.tablename()+" where "+obj.id()+"=#{"+obj.id()+"}";
 	}
-	public String insert(T obj) {
-		BEGIN();
 
+	public String insert(T obj) throws ValitationException {
+		MessageData msgData = validate(obj);
+		if(!msgData.checkIsSuccess()){
+			throw new ValitationException(msgData.getMsg());
+		}
+		BEGIN();
+		
 		INSERT_INTO(obj.tablename());
 		obj.caculationColumnList();
 		VALUES(obj.returnInsertColumnsName(), obj.returnInsertColumnsDefine());
-
+		
 		return SQL();
 	}
 
-	public String update(T obj) {
+	public String update(T obj) throws ValitationException {
+		MessageData msgData = validate(obj);
+		if(!msgData.checkIsSuccess()){
+			throw new ValitationException(msgData.getMsg());
+		}
+		validate(obj);
 		String idname = obj.id();
 		BEGIN();
 		UPDATE(obj.tablename());
@@ -157,6 +172,17 @@ public class CUDTemplate<T extends BaseEntity, ID extends Serializable> {
 		WHERE(idname + "=#{" + idname + "}");
 
 		return SQL();
+	}
+	
+	/**
+	 * 验证对象
+	 */
+	private MessageData validate(Object obj){
+		String msg = ValitatorUtil.instance.validateModel(obj);
+		if(StringUtils.isNotBlank(msg)){
+			return Message.error(msg);
+		}
+		return Message.success("验证通过!");
 	}
 
 

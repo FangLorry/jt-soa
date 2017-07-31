@@ -3,16 +3,14 @@ package com.fangjt.member.controller;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,9 +19,8 @@ import com.fangjt.common.orm.Filter;
 import com.fangjt.common.orm.SelectOption;
 import com.fangjt.common.orm.SelectOptionBuilder;
 import com.fangjt.common.orm.Sequencer;
-import com.fangjt.common.utils.UUIDUtils;
 import com.fangjt.common.vo.Message;
-import com.fangjt.fastdfs.FastDFSClient;
+import com.fangjt.common.vo.MessageData;
 import com.fangjt.fastdfs.FileManagerUtils;
 import com.fangjt.member.entity.Member;
 import com.fangjt.member.service.IMemberService;
@@ -34,7 +31,7 @@ import com.fangjt.openapi.service.IProductService;
 
 @Component
 @RequestMapping("/test")
-public class TestController {
+public class TestController{
 	
 	@Autowired
 	private IMemberService memberService;
@@ -44,14 +41,17 @@ public class TestController {
 	private FileManagerUtils fileManagerUtils;
 	@RequestMapping("testdubbo.do")
 	@ResponseBody
-	public void testdubbo() throws Exception{
-		memberService.insertMe();
+	public MessageData testdubbo(@RequestParam(defaultValue="",required=false) String name) throws Exception{
+		//memberService.insertMe();
+		Member member  = new Member();
+		member.setName(name);
+		memberService.update(member);
 		if(productService==null){
-			System.err.println("亲,您的dubbo服务未开启吧!");
-			return ;
+			return Message.success("亲,您的dubbo服务未开启吧!");
 		}
 		List<Product> productList = productService.findAll();
 		System.err.println("鏈接dubbo成功!"+productList.size());
+		return Message.success("鏈接dubbo成功!"+productList.size());
 	}
 	
 	
@@ -82,7 +82,7 @@ public class TestController {
 	
 	@ResponseBody
 	@RequestMapping(value="/testImg",method=RequestMethod.POST)
-	public Map<String, Object> testImg(Model model, MultipartFile img){
+	public MessageData testImg(Model model, MultipartFile img){
 		File file = null;
 		try {
 			String filename = img.getOriginalFilename();

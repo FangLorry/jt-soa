@@ -14,7 +14,7 @@ import org.csource.fastdfs.StorageClient1;
 import org.springframework.stereotype.Component;
 
 import com.fangjt.common.orm.Filter;
-import com.fangjt.common.utils.UUIDUtils;
+import com.fangjt.common.utils.UUIDUtil;
 import com.fangjt.mongodb.entity.MongoFile;
 import com.fangjt.mongodb.utils.MongoDBUtils;
 

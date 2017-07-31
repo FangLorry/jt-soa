@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fangjt.common.orm.Filter;
-import com.fangjt.common.utils.UUIDUtils;
+import com.fangjt.common.utils.UUIDUtil;
 import com.fangjt.mongodb.entity.MongoFile;
 import com.fangjt.mongodb.utils.MongoDBUtils;
 
@@ -48,7 +48,7 @@ public class FileManagerUtils {
 		// 將文件信息存到mongodb中
 		mongoFile = new MongoFile();
 		mongoFile.setFileId(fileId);
-		mongoFile.setId(UUIDUtils.uuid());
+		mongoFile.setId(UUIDUtil.uuid());
 		mongoFile.setCreateTime(new Date());
 		mongoFile.setUpdateTime(new Date());
 		mongoFile.setFileName(file.getName());

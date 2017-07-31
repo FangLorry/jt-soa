@@ -1,7 +1,5 @@
 package com.fangjt.openapi.controller;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fangjt.cache.JedisUtils;
@@ -27,7 +24,7 @@ import com.fangjt.common.orm.SelectOptionBuilder;
 import com.fangjt.common.orm.SelectPageOption;
 import com.fangjt.common.orm.Sequencer;
 import com.fangjt.common.vo.Message;
-import com.fangjt.fastdfs.FastDFSClient;
+import com.fangjt.common.vo.MessageData;
 import com.fangjt.mq.service.MqProducer;
 import com.fangjt.openapi.entity.Product;
 import com.fangjt.openapi.service.IProductService;
@@ -51,16 +48,16 @@ public class ProductController {
 	
 	@ResponseBody
 	@RequestMapping(value="/list.jhtml",method=RequestMethod.POST)
-	public Map<String, Object> list(Model model,
+	public MessageData list(Model model,
 			HttpServletRequest request ,
 			@RequestParam(required=false,defaultValue="1") int pageNum,
 			@RequestParam(required=false,defaultValue="10") int pageSize,
 			@RequestParam(required=false,defaultValue="") String search
 			){
-		String value = jedisUtils.get("123");
-		Map<String,Object> msg = new HashMap<String,Object>();
-        msg.put("data","hello,rabbmitmq!");
-		mqProducer.sendMsg("test_queue_key", msg);
+//		String value = jedisUtils.get("123");
+//		Map<String,Object> msg = new HashMap<String,Object>();
+//        msg.put("data","hello,rabbmitmq!");
+//		mqProducer.sendMsg("test_queue_key", msg);
 		SelectPageOption pageOption = new SelectPageOption(pageNum,pageSize);
 		if(StringUtils.isNotBlank(search)){
 			List<Filter> flist = new ArrayList<Filter>();
@@ -91,7 +88,7 @@ public class ProductController {
 	}
 	@ResponseBody
 	@RequestMapping(value="/sendMsg",method=RequestMethod.POST)
-	public Map<String, Object> list(Model model,String msg){
+	public MessageData list(Model model,String msg){
 		Map<String,Object> obj = new HashMap<String,Object>();
 		obj.put("data",msg);
 		if(msg.indexOf("error") > 0){

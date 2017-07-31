@@ -24,26 +24,27 @@ public class MemberService extends BaseService<Member,String>  implements  IMemb
 	@Override
 	public void insertMe(){
 		Member member  = new Member();
-		member.setName("小明");
+		member.setName("123");
+		update(member);
 		
-		Product product = new Product();
-		product.setContent_("heheh");
-		product.setName("小");
-		try{
-			productService.update(product);
-			transactionTemplate.execute(new TransactionCallback<Integer>(){
-
-				@Override
-				public Integer doInTransaction(TransactionStatus arg0) {
-					// TODO Auto-generated method stub
-					update(member);
-					return 1;
-				}
-				
-			});
-		}catch(Exception ex){
-			System.err.println("----------------执行失败-------------");
-		}
+//		Product product = new Product();
+//		product.setContent_("heheh");
+//		product.setName("小");
+//		try{
+//			productService.update(product);
+//			transactionTemplate.execute(new TransactionCallback<Integer>(){
+//
+//				@Override
+//				public Integer doInTransaction(TransactionStatus arg0) {
+//					// TODO Auto-generated method stub
+//					update(member);
+//					return 1;
+//				}
+//				
+//			});
+//		}catch(Exception ex){
+//			System.err.println("----------------执行失败-------------");
+//		}
 		
 		System.err.println("----------------还跑-------------");
 		
