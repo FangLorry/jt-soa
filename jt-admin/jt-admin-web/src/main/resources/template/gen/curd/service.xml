@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>service</name>
+	<filePath>src/gen-output/service/${packageName}/${moduleName}/${subModuleName}/service</filePath>
+	<fileName>I${ClassName}Service.java</fileName>
+	<content><![CDATA[
+/**
+ * Copyright &copy; 2012-2018 <a href="http://www.kingdee.com">金蝶软件</a> All rights reserved.
+ */
+package ${packageName}.${moduleName}<#if subModuleName != "">.${subModuleName}</#if>.service;
+
+import com.bc.framework.orm.service.IBaseCrudService;
+
+import ${packageName}.${moduleName}<#if subModuleName != "">.${subModuleName}</#if>.entity.${ClassName};
+
+/**
+ * ${functionName}Service
+ * @author ${functionAuthor}
+ * @version ${functionVersion}
+ */
+public interface I${ClassName}Service extends IBaseCrudService<${ClassName}>{
+	 
+ 
+}]]>
+	</content>
+</template>

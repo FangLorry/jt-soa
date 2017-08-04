@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>entity</name>
+	<filePath>src/gen-output/service/${packageName}/${moduleName}/${subModuleName}/entity</filePath>
+	<fileName>${ClassName}.java</fileName>
+	<content><![CDATA[
+/**
+ * Copyright &copy; 2012-2018 <a href="http://www.kingdee.com">金蝶软件</a> All rights reserved.
+ */
+package ${packageName}.${moduleName}<#if subModuleName != "">.${subModuleName}</#if>.entity;
+ 
+import com.bc.framework.entity.BaseEntity;
+
+
+/**
+ * ${functionName}Entity
+ * @author ${functionAuthor}
+ * @version ${functionVersion}
+ */
+public class ${ClassName} extends BaseEntity {
+	
+	private static final long serialVersionUID = 1L;
+	<#-- 生成字段属性 -->
+	<#list table.columnList as c>
+		<#-- 如果不是基类属性 -->
+		<#if c.isNotBaseField?? && c.isNotBaseField>
+			<#-- 父类对象 -->
+			<#if table.parentExists?? && table.parentExists && table.parentTableFk == c.name>
+	private ${table.parent.className?cap_first} ${c.javaField};		<#if c.comments??>// ${c.comments} 父类</#if>
+			<#-- 其它字段 -->
+			<#else>
+	private ${c.javaType} ${c.javaField};		<#if c.comments??>// ${c.comments}</#if>
+			</#if>
+		</#if>
+	</#list>
+	<#-- 范围条件字段 -->
+	<#list table.columnList as c>
+		<#if c.isQuery?? && c.isQuery == 1 && c.queryType == "between">
+	private ${c.javaType} begin${c.javaField?cap_first};		<#if c.comments??>// 开始 ${c.comments}</#if>
+	private ${c.javaType} end${c.javaField?cap_first};		<#if c.comments??>// 结束 ${c.comments}</#if>
+		</#if>
+	</#list>
+	<#-- 子表列表字段 -->
+	<#list table.childList as c>
+	private List<${c.className?cap_first}> ${c.className?uncap_first}List = Lists.newArrayList();		// 子表列表
+	</#list>
+	
+	<#-- 构造方法 -->
+	public ${ClassName}() {
+		super();
+	}
+
+	public ${ClassName}(String id){
+		
+	}
+  
+	<#list table.columnList as c>
+		<#if table.parentExists??&& table.parentExists && table.parentTableFk == c.name>
+
+	public ${ClassName}(${table.parent.className?cap_first} ${c.javaField}){
+		this.${c.javaField} = ${c.javaField};
+	}
+		</#if>
+	</#list>
+
+	<#-- 生成get和set方法 -->
+	<#list table.columnList as c>
+		<#-- 如果不是基类属性 -->
+		<#if c.isNotBaseField?? &&  c.isNotBaseField>
+			<#list c.simpleAnnotationList as a>
+	@${a}
+			</#list>
+			<#-- 父类对象 -->
+			<#if table.parentExists??&& table.parentExists && table.parentTableFk == c.name>
+	public ${table.parent.className?cap_first} get${c.javaField?cap_first}() {
+		return ${c.javaField};
+	}
+
+	public void set${c.javaField?cap_first}(${table.parent.className?cap_first} ${c.javaField}) {
+		this.${c.javaField} = ${c.javaField};
+	}
+	
+			<#-- 其它字段 -->
+			<#else>
+	public ${c.javaType} get${c.javaField?cap_first}() {
+		return ${c.javaField};
+	}
+
+	public void set${c.javaField?cap_first}(${c.javaType} ${c.javaField}) {
+		this.${c.javaField} = ${c.javaField};
+	}
+	
+			</#if>
+		</#if>
+	</#list>
+	<#-- 范围条件字段get和set方法 -->
+	<#list table.columnList as c>
+		<#if c.isQuery?? && c.isQuery == 1 && c.queryType == "between">
+	public ${c.javaType} getBegin${c.javaField?cap_first}() {
+		return begin${c.javaField?cap_first};
+	}
+
+	public void setBegin${c.javaField?cap_first}(${c.javaType} begin${c.javaField?cap_first}) {
+		this.begin${c.javaField?cap_first} = begin${c.javaField?cap_first};
+	}
+	
+	public ${c.javaType} getEnd${c.javaField?cap_first}() {
+		return end${c.javaField?cap_first};
+	}
+
+	public void setEnd${c.javaField?cap_first}(${c.javaType} end${c.javaField?cap_first}) {
+		this.end${c.javaField?cap_first} = end${c.javaField?cap_first};
+	}
+		
+		</#if>
+	</#list>
+	<#-- 子表列表get和set方法 -->
+	<#list table.childList as c>
+	public List<${c.className?cap_first}> get${c.className?cap_first}List() {
+		return ${c.className?uncap_first}List;
+	}
+
+	public void set${c.className?cap_first}List(List<${c.className?cap_first}> ${c.className?uncap_first}List) {
+		this.${c.className?uncap_first}List = ${c.className?uncap_first}List;
+	}
+	</#list>
+}]]>
+	</content>
+</template>

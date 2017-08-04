@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>mapper</name>
+	<filePath>src/gen-output/biz/${packageName}/${moduleName}/${subModuleName}/mapper</filePath>
+	<fileName>${ClassName}Mapper.xml</fileName>
+	<content><![CDATA[
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${packageName}.${moduleName}<#if subModuleName != "">.${subModuleName}</#if>.mapper.${ClassName}Mapper">
+    
+    <#-- 实体映射 -->
+	<resultMap id="BaseResultMap" type="${packageName}.${moduleName}<#if subModuleName != "">.${subModuleName}</#if>.entity.${ClassName}">
+	<#list table.columnList as c> 
+		<result column="${c.name}" property="${c.javaType}" jdbcType="${c.myBatisJdbcType}" />
+	</#list>
+	</resultMap>
+	
+    <#-- 输出字段列 -->
+	<sql id="Base_Column_List" >
+		<#assign columnField>
+			<#list table.columnList as c>
+		a.${c.name} AS "${c.javaType}",
+			</#list>
+			<#list table.columnList as c>
+				<#if c.showType?? && c.showType == "userselect">
+					<#list c.javaFieldAttrs as a>
+		u${c_index + 1}.${a[1]} AS "${c.javaField}.${a[0]}",
+					</#list>
+				<#elseif c.showType?? && c.showType == "officeselect">
+					<#list c.javaFieldAttrs as a>
+		o${c_index + 1}.${a[1]} AS "${c.javaField}.${a[0]}",
+					</#list>
+				<#elseif c.showType?? && c.showType == "areaselect">
+					<#list c.javaFieldAttrs as a>
+		a${c_index + 1}.${a[1]} AS "${c.javaField}.${a[0]}",
+					</#list>
+				</#if>
+				<#-- 父表关联字段 -->
+				<#if table.parentExists?? && table.parentExists && table.parentTableFk == c.name>
+					<#list c.javaFieldAttrs as a>
+		b.${a[1]} AS "${c.javaField}.${a[0]}",
+					</#list>
+				</#if>
+			</#list>
+		</#assign>
+		<#if columnField?last_index_of(",")!=-1>
+		${columnField?substring(0, columnField?last_index_of(","))}
+		</#if>
+	</sql>
+	
+	<#-- 输出字段关联表 -->
+	<sql id="${className}Joins">
+		<#-- 关联父表 -->
+		<#if table.parentExists?? && table.parentExists>
+		LEFT JOIN ${table.parent.name} b ON b.id = a.${table.parentTableFk}
+		</#if>
+		<#-- 关联系统表 -->
+		<#list table.columnList as c>
+			<#if c.showType?? && c.showType == "userselect">
+		LEFT JOIN sys_user u${c_index + 1} ON u${c_index + 1}.id = a.${c.name}
+			<#elseif c.showType?? && c.showType == "officeselect">
+		LEFT JOIN sys_office o${c_index + 1} ON o${c_index + 1}.id = a.${c.name}
+			<#elseif c.showType?? && c.showType == "areaselect">
+		LEFT JOIN sys_area a${c_index + 1} ON a${c_index + 1}.id = a.${c.name}
+			</#if>
+		</#list>
+	</sql>
+   
+   
+   
+	<!-- 精准查询 -->
+	<sql id="allAndEqual">
+		<trim suffix="" suffixOverrides=",">
+		<#list  table.columnList as col>
+		  
+			<if test="${col.javaType} != null" >
+				 and ${col.name} = <#noparse>#{</#noparse>${col.javaType}, jdbcType=${col.myBatisJdbcType}}
+			</if>
+		</#list>
+		</trim>
+	</sql>
+	
+	<!-- 模糊查询 -->
+	<sql id="allAndLike">
+		<trim suffix="" suffixOverrides=",">
+		<#list  table.columnList as col>
+			 
+			<if test="${col.javaType} != null" > and ${col.name} like concat('%',<#noparse>#{</#noparse>${col.javaType}, jdbcType=${col.myBatisJdbcType}<#noparse>}</#noparse><#if col_has_next></#if>,'%')</if>
+		</#list>
+		</trim>
+	</sql>
+	
+   
+     <sql id="whereStatement">
+        <where>
+            1=1
+            
+        </where>
+    </sql>
+    
+    <!-- 单条查询 -->
+	<select id="select" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List"/>
+		from  ${table.name} a
+		<where><include refid="allAndEqual"/></where>
+	</select>
+   
+   
+	<!-- 分页查询订单总条数 -->
+	<select id="selectCount" parameterType="${packageName}.${moduleName}<#if subModuleName != "">.${subModuleName}</#if>.entity.${ClassName}" resultType="int">
+		select count(1)	from ${table.name} as a where 1=1
+		<include refid="whereStatement"/>
+	</select>
+	
+	
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
+		SELECT 
+			<include refid="Base_Column_List"/>
+		FROM ${table.name} a
+		<include refid="${className}Joins"/>
+		WHERE a.id = ${"#"}{id}
+	</select>
+	
+	
+	 <!-- 单条查询 -->
+	<select id="selectOne" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List"/>
+		from  ${table.name} a
+		<where><include refid="allAndEqual"/></where>
+	</select>
+	
+	
+   
+   	<insert id="insert">
+		INSERT INTO ${table.name}(
+		<#assign insertField>
+			<#list table.columnList as c>
+				<#if c.isInsert?? && c.isInsert == 1>
+			${c.name},
+				</#if>
+			</#list>
+		</#assign>
+	${insertField?substring(0, insertField?last_index_of(","))}
+		) VALUES (
+		<#assign insertJavaField>
+			<#list table.columnList as c>
+				<#if c.isInsert?? && c.isInsert == 1>
+			${"#"}{${c.javaType}},
+				</#if>
+			</#list>
+		</#assign>
+	${insertJavaField?substring(0, insertJavaField?last_index_of(","))}
+		)
+	</insert>
+	
+	
+   
+   	<insert id="insertSelective">
+		INSERT INTO ${table.name}(
+		<#assign insertField>
+			<#list table.columnList as c>
+				<#if c.isInsert?? && c.isInsert == 1>
+			${c.name},
+				</#if>
+			</#list>
+		</#assign>
+	${insertField?substring(0, insertField?last_index_of(","))}
+		) VALUES (
+		<#assign insertJavaField>
+			<#list table.columnList as c>
+				<#if c.isInsert?? && c.isInsert == 1>
+			${"#"}{${c.javaType}},
+				</#if>
+			</#list>
+		</#assign>
+	${insertJavaField?substring(0, insertJavaField?last_index_of(","))}
+		)
+	</insert>
+	
+
+	<update id="delete">
+	<#if table.delFlagExists?? && table.delFlagExists>
+		UPDATE ${table.name} SET 
+			is_del = ${"#"}{DEL_FLAG_DELETE}
+	<#else>
+		DELETE FROM ${table.name}
+	</#if>
+	<#if table.parentExists?? && table.parentExists>
+		<#list table.columnList as c>
+			<#if table.parentTableFk == c.name>
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = ${"#"}{id}
+			</when>
+			<otherwise>
+				WHERE ${table.parentTableFk} = ${"#"}{${c.javaType}}
+			</otherwise>
+		</choose>
+			</#if>
+		</#list>
+	<#else>
+		WHERE id = ${"#"}{id}
+	</#if>
+	</update>
+	
+	<update id="deleteByPrimaryKey">
+	<#if table.delFlagExists?? && table.delFlagExists>
+		UPDATE ${table.name} SET 
+			is_del = ${"#"}{DEL_FLAG_DELETE}
+	<#else>
+		DELETE FROM ${table.name}
+	</#if>
+	<#if table.parentExists?? && table.parentExists>
+		<#list table.columnList as c>
+			<#if table.parentTableFk == c.name>
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = ${"#"}{id}
+			</when>
+			<otherwise>
+				WHERE ${table.parentTableFk} = ${"#"}{${c.javaType}}
+			</otherwise>
+		</choose>
+			</#if>
+		</#list>
+	<#else>
+		WHERE id = ${"#"}{id}
+	</#if>
+	</update>
+	
+	
+	
+		<update id="updateByPrimaryKey">
+		UPDATE ${table.name} SET 	
+			<#assign updateField>		
+				<#list table.columnList as c>
+					<#if c.isEdit?? && c.isEdit == 1>
+			${c.name} = ${"#"}{${c.javaType}},
+					</#if>
+				</#list>
+			</#assign>
+${updateField?substring(0, updateField?last_index_of(","))}
+		WHERE id = ${"#"}{id}
+	</update>
+	
+	<update id="updateByPrimaryKeySelective">
+		UPDATE ${table.name} SET 
+			<#assign updateField>		
+			<trim suffixOverrides="," >	
+				<#list table.columnList as c>
+					<#if c.isEdit?? && c.isEdit == 1>
+					 <if test="${c.javaType} != null and ${c.javaType} != '' " >	${c.name} = ${"#"}{${c.javaType}},</if> 
+					</#if>
+				</#list> 
+			</trim>
+			</#assign>
+${updateField}
+		WHERE id = ${"#"}{id}
+	</update>
+	
+	
+	   <!-- 获取List -->
+	<select id="findPageList" resultMap="BaseResultMap"
+		parameterType="com.bc.framework.page.Pager">
+		 SELECT
+        <include refid="Base_Column_List" />
+        FROM ${table.name} a where 1=1
+        
+       	and a.is_del = 0 
+		
+	</select>
+	
+	
+	
+	<select id="selectByParams" resultMap="BaseResultMap" parameterType="map">
+		SELECT 
+			<include refid="Base_Column_List"/>
+		FROM ${table.name} a
+		<include refid="${className}Joins"/>
+		<where>
+			<#if table.delFlagExists?? && table.delFlagExists>a.is_del = ${"#"}{DEL_FLAG_NORMAL}</#if>
+			<#list table.columnList as c>
+				<#if (c.isQuery?? && c.isQuery == 1) || (table.parentExists?? && table.parentExists && table.parentTableFk == c.name)>
+					<#if c.queryType ?? && c.queryType == 'between'>
+			<if test="begin${c.simpleJavaField?cap_first} != null and end${c.simpleJavaField?cap_first} != null <#if c.simpleJavaField != c.javaType>and begin${c.javaType?cap_first} != null and end${c.javaType?cap_first} != null </#if>and begin${c.javaType?cap_first} != '' and end${c.javaType?cap_first} != ''">
+					<#else>
+			<if test="${c.simpleJavaField} != null<#if c.simpleJavaField != c.javaType> and ${c.javaType} != null</#if> and ${c.javaType} != ''">
+					</#if>
+					<#if c.queryType ?? && c.queryType == 'between'>
+				AND a.${c.name} BETWEEN ${"#"}{begin${c.simpleJavaField?cap_first}} AND ${"#"}{end${c.simpleJavaField?cap_first}}
+					<#elseif c.queryType ?? && c.queryType == 'like'>
+				AND a.${c.name} LIKE 
+					<if test="dbName == 'oracle'">'%'||${"#"}{${c.javaType}}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+${"#"}{${c.javaType}}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',${"#"}{${c.javaType}},'%')</if>
+					<#elseif c.queryType ?? && c.queryType == 'left_like'>
+				AND a.${c.name} LIKE 
+					<if test="dbName == 'oracle'">'%'||${"#"}{${c.javaType}}</if>
+					<if test="dbName == 'mssql'">'%'+${"#"}{${c.javaType}}</if>
+					<if test="dbName == 'mysql'">concat('%',${"#"}{${c.javaType}})</if>
+					<#elseif c.queryType ?? && c.queryType == 'right_like'>
+				AND a.${c.name} LIKE 
+					<if test="dbName == 'oracle'">${"#"}{${c.javaType}}||'%'</if>
+					<if test="dbName == 'mssql'">${"#"}{${c.javaType}}+'%'</if>
+					<if test="dbName == 'mysql'">concat(${"#"}{${c.javaType}},'%')</if>
+					<#else>
+				AND a.${c.name} ${c.queryType} ${"#"}{${c.javaType}}
+					</#if>
+			</if>
+				</#if>
+			</#list>
+		</where>
+		<!-- <choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${"$"}{page.orderBy}
+			</when>
+			<otherwise>
+				 
+			</otherwise>
+		</choose> -->
+	</select>
+	
+
+	
+
+	
+
+    
+</mapper>]]>
+	</content>
+</template>

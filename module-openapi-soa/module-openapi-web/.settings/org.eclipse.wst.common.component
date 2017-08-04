@@ -11,21 +11,6 @@
         <dependent-module archiveName="module-openapi-service-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/module-openapi-service/module-openapi-service">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="jt-framework-orm-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/jt-framework-orm/jt-framework-orm">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="jt-framework-cache-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/jt-framework-cache/jt-framework-cache">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="jt-framework-mq-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/jt-framework-mq/jt-framework-mq">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="jt-framework-file-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/jt-framework-file/jt-framework-file">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="jt-framework-mongodb-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/jt-framework-mongodb/jt-framework-mongodb">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
         <property name="context-root" value="module-openapi-web"/>
         <property name="java-output-path" value="/module-openapi-web/target/classes"/>
     </wb-module>

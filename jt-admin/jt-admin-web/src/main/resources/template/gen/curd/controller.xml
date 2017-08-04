@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>controller</name>
+	<filePath>src/gen-output/web/${packageName}/${moduleName}/${subModuleName}/controller</filePath>
+	<fileName>${ClassName}Controller.java</fileName>
+	<content><![CDATA[
+/**
+ * Copyright &copy; 2012-2018 <a href="http://www.kingdee.com">金蝶软件</a> All rights reserved.
+ */
+package ${packageName}.${moduleName}<#if subModuleName != "">.${subModuleName}</#if>.controller;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import com.google.common.collect.Maps;
+import com.github.pagehelper.PageHelper;
+
+
+import com.kingdee.base.common.exception.ServiceException;
+import com.kingdee.base.common.utils.PageUtils;
+import com.kingdee.base.web.controller.BaseGeneralController;
+
+import ${packageName}.${moduleName}<#if subModuleName != "">.${subModuleName}</#if>.entity.${ClassName};
+import ${packageName}.${moduleName}<#if subModuleName != "">.${subModuleName}</#if>.service.I${ClassName}Service;
+
+/**
+ * ${functionName}Controller
+ * @author ${functionAuthor}
+ * @version ${functionVersion}
+ */
+@Controller
+@RequestMapping(value = "/${urlPrefix}")
+public class ${ClassName}Controller extends BaseGeneralController {
+
+	@Autowired
+	private I${ClassName}Service ${className}Service;
+	
+	@ModelAttribute
+	public void get(@RequestParam(required=false) String id,Model model) {
+		${ClassName} entity = null;
+		if ( StringUtils.isNotBlank(id)){
+			entity = ${className}Service.loadById(id);
+			if(entity!=null){
+				model.addAttribute("editItem", entity) ;
+			}
+		}
+		
+	}
+	
+	@RequiresPermissions("${permissionPrefix}:view")
+	@RequestMapping(value = {"list", ""})
+	public String list(${ClassName} ${className}, HttpServletRequest request, HttpServletResponse response, Model model) {
+		return "${viewPrefix}List";
+	}
+	@ResponseBody
+	@RequiresPermissions("${permissionPrefix}:view")
+	@RequestMapping(value = {"list.json", ""})
+	public PageUtils<${ClassName}> listJson(${ClassName} ${className}, HttpServletRequest request, HttpServletResponse response, Model model,
+		@RequestParam(value = "pageNumber", defaultValue = PAGE_NO) int pageNumber,
+			@RequestParam(value = "pageSize", defaultValue = PAGE_SIZE) int pageSize) {
+	
+		PageHelper.startPage(pageNumber, pageSize, true);
+
+		Map<String, Object> params = builderParams(request, model);
+		List<${ClassName}> result;
+		try {
+			result = ${className}Service.findByParams(params);
+			PageUtils<${ClassName}> page = new PageUtils<${ClassName}>(result);
+			page.setList(result);
+	        return page;
+	        
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+   		return null;
+	}
+
+	@RequiresPermissions("${permissionPrefix}:view")
+	@RequestMapping(value = "form")
+	public String form(@ModelAttribute("editItem") ${ClassName} ${className}, Model model) {
+		model.addAttribute("${className}", ${className});
+		return "${viewPrefix}Form";
+	}
+
+	@RequiresPermissions("${permissionPrefix}:edit")
+	@RequestMapping(value = "save")
+	public @ResponseBody
+	Map<String, String>  save(@ModelAttribute("editItem") ${ClassName} ${className}, Model model, RedirectAttributes redirectAttributes)throws ServiceException  {
+		if (!beanValidatorForModel(model, ${className})){
+			
+			Map<String, String> map = Maps.newHashMap();
+			map.put("statusCode", "200");
+			map.put("closeCurrent", "false"); 
+			map.put("message", "保存${functionNameSimple}成功"); 
+			return map;
+		
+		}
+		Map<String, String> map = Maps.newHashMap();
+		if(StringUtils.isNotBlank(${className}.getId()) ){
+			${className}Service.modifyById(${className});
+			map.put("message", "修改${functionNameSimple}成功"); 
+		}else{
+			${className}Service.insert(${className});
+			map.put("message", "保存${functionNameSimple}成功"); 
+		}
+
+		map.put("statusCode", "200");
+		map.put("closeCurrent", "true");
+		map.put("tabid", "/${urlPrefix}/list"); 
+		return map;
+		
+	}
+	
+	@RequiresPermissions("${permissionPrefix}:edit")
+	@RequestMapping(value = "delete")
+	public @ResponseBody
+	Map<String, String>  delete(@RequestParam(value = "id", defaultValue = "") String id, RedirectAttributes redirectAttributes)throws ServiceException {
+		if(StringUtils.isNotBlank(id)){
+			${className}Service.removeById(id);
+		}
+ 
+		Map<String, String> map = Maps.newHashMap();
+		map.put("statusCode", "200"); 
+		map.put("tabid", "/${urlPrefix}/list"); 
+		map.put("message", "删除${functionNameSimple}成功"); 
+		return map;
+		
+	}
+
+}]]>
+	</content>
+</template>

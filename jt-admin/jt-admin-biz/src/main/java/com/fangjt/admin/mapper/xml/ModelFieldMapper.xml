@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangjt.admin.mapper.ModelFieldMapper">
+	<resultMap id="result" type="java.util.HashMap">
+	</resultMap>
+	<resultMap id="modelFieldMap" type="com.fangjt.admin.entity.codeGen.ModelField">
+	</resultMap>
+	
+	<resultMap id="modelFieldMap1" type="com.fangjt.admin.entity.codeGen.ModelField">
+		<result column="id" property="id" jdbcType="INTEGER" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="comments" property="comments" jdbcType="VARCHAR" />
+		<result column="jdbc_type" property="jdbcType" jdbcType="VARCHAR" />
+		<result column="java_type" property="javaType" jdbcType="VARCHAR" />
+		<result column="java_field" property="javaField" jdbcType="VARCHAR" />
+		<result column="is_pk" property="isPk" jdbcType="BIT" />
+		<result column="is_null" property="isNull" jdbcType="BIT" />
+		<result column="is_insert" property="isInsert" jdbcType="BIT" />
+		<result column="is_edit" property="isEdit" jdbcType="BIT" />
+		<result column="is_list" property="isList" jdbcType="BIT" />
+		<result column="is_query" property="isQuery" jdbcType="BIT" />
+		<result column="query_type" property="queryType" jdbcType="VARCHAR" />
+		<result column="show_type" property="showType" jdbcType="VARCHAR" />
+		<result column="dict_type" property="dictType" jdbcType="VARCHAR" />
+		<result column="sort" property="sort" jdbcType="INTEGER" />
+		<result column="is_del" property="isDel" jdbcType="BIT" />
+
+	</resultMap>
+	<sql id="Base_Column_List">
+		a.*
+	</sql>
+	<select id="findListByModelId" resultMap="modelFieldMap1">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM jt_model_field a
+		WHERE 1=1 and model_id = #{_parameter,jdbcType=VARCHAR} 
+		ORDER BY a.sort ASC
+	</select>
+</mapper>

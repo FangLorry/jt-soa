@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>viewForm</name>
+	<filePath>src/gen-output/main/webapp/WEB-INF/views/${lastPackageName}/${moduleName}/${subModuleName}</filePath>
+	<fileName>${className}Form.ftl</fileName>
+	<content><![CDATA[
+
+]]>
+	</content>
+</template>

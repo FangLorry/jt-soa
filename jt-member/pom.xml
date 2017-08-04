@@ -36,11 +36,6 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-		    <groupId>com.google.cloud.sql</groupId>
-		    <artifactId>mysql-socket-factory-core</artifactId>
-		    <version>1.0.3</version>
-		</dependency>
-		<dependency>
 			<groupId>com.fangjt</groupId>
 			<artifactId>module-openapi-service</artifactId>
 			<version>0.0.1-SNAPSHOT</version>

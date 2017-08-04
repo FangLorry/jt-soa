@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>dao</name>
+	<filePath>src/gen-output/service/${packageName}/${moduleName}/dao/${subModuleName}</filePath>
+	<fileName>${ClassName}Dao.java</fileName>
+	<content><![CDATA[
+/**
+ * Copyright &copy; 2012-2018 <a href="http://www.kingdee.com">金蝶软件</a> All rights reserved.
+ */
+package ${packageName}.${moduleName}.dao<#if subModuleName != "">.${subModuleName}</#if>;
+
+import com.boocu.core.orm.mybatis.SqlMapper;
+import com.boocu.core.common.dao.CrudDao;
+import com.boocu.core.utils.page.Pager;
+
+import ${packageName}.${moduleName}.entity<#if subModuleName != "">.${subModuleName}</#if>.${ClassName};
+
+/**
+ * ${functionName}DAO接口
+ * @author ${functionAuthor}
+ * @version ${functionVersion}
+ */
+@SqlMapper
+public interface ${ClassName}Dao extends CrudDao<${ClassName}> {
+	
+}]]>
+	</content>
+</template>
